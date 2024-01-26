@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { Stmt, Program, Expr, BinaryExpr, NumericLiteral, Identifier } from "./ast.ts";
 import { ft_tokenize, Token, TokenType } from "./lexer.ts";
 
@@ -18,6 +19,14 @@ export default class Parser {
         return prev
     }
 
+    private expect(type: TokenType, err: any) {
+        const prev = this.tokens.shift() as Token;
+        if (!prev || prev.type != type) {
+            console.error("Parser Error:\n", err, prev, "\n- Expecting: ", type)
+            Deno.exit(1)
+        }
+        return prev;
+    }
     public produceAST(sourceCode: string): Program {
         this.tokens = ft_tokenize(sourceCode);
 
@@ -31,7 +40,6 @@ export default class Parser {
         }
         return program
     }
-
 
     private parse_stmt(): Stmt {
         return this.parse_expr();
@@ -47,9 +55,26 @@ export default class Parser {
     // (10 + (10 - x)) - 5
     // (10 + 5) - 5
     private parse_additive_expr(): Expr {
-        let left = this.parse_primary_expr();
+        let left = this.parse_multiplicative_expr();
 
         while (["+", "-"].includes(this.at().value)) {
+            const operator = this.eat().value;
+            const right = this.parse_multiplicative_expr();
+            left = {
+                kind: "BinaryExpr",
+                left,
+                right,
+                operator
+            } as BinaryExpr
+        }
+
+        return left
+    }
+
+    private parse_multiplicative_expr(): Expr {
+        let left = this.parse_primary_expr();
+
+        while (["*", "/", "%"].includes(this.at().value)) {
             const operator = this.eat().value;
             const right = this.parse_primary_expr();
             left = {
@@ -81,6 +106,12 @@ export default class Parser {
                 return { kind: "Identifier", symbol: this.eat().value } as Identifier
             case TokenType.Number:
                 return { kind: "NumericLiteral", value: parseFloat(this.eat().value) } as NumericLiteral
+            case TokenType.OpenParen: {
+                this.eat(); // eat openning parenthesis
+                const value = this.parse_expr()
+                this.expect(TokenType.CloseParen, "Unexpected token found inside parenthesised expression. Expected closing parenthesis."); // eat openning parenthesis
+                return value;
+            }
             default:
                 console.error(`Unexpected token found during parsing! `, this.at())
                 // trick the compiler for TS

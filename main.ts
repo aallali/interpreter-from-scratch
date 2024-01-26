@@ -7,7 +7,7 @@ repl();
 
 async function repl () {
     const parser = new Parser();
-    console.log("\n REPL v0.1");
+    console.log("\nREPL v0.1");
 
     while(true) {
 

@@ -48,7 +48,7 @@ export function ft_tokenize(sourceCode: string): Token[] {
             tokens.push(token(src.shift(), TokenType.OpenParen))
         } else if (src[0] == ')') {
             tokens.push(token(src.shift(), TokenType.CloseParen))
-        } else if (["+", "-", "*", "/"].includes(src[0])) {
+        } else if (["+", "-", "*", "/", "%"].includes(src[0])) {
             tokens.push(token(src.shift(), TokenType.BinaryOperator))
         } else if (src[0] == '=') {
             tokens.push(token(src.shift(), TokenType.Equals))

@@ -15,20 +15,86 @@ Thanks to @tlaceby's series about building interpreters from scratch: https://ww
 
 ### Repl:
 ```shell
-
- REPL v0.1
-$>  1 + 2
+REPL v0.1
+$>  42 * (3 - 1)
+{
+  kind: "Program",
+  body: [
+    {
+      kind: "BinaryExpr",
+      left: { kind: "NumericLiteral", value: 42 },
+      right: {
+        kind: "BinaryExpr",
+        left: { kind: "NumericLiteral", value: 3 },
+        right: { kind: "NumericLiteral", value: 1 },
+        operator: "-"
+      },
+      operator: "*"
+    }
+  ]
+}
+$>  42 * 3 - 1
+{
+  kind: "Program",
+  body: [
+    {
+      kind: "BinaryExpr",
+      left: {
+        kind: "BinaryExpr",
+        left: { kind: "NumericLiteral", value: 42 },
+        right: { kind: "NumericLiteral", value: 3 },
+        operator: "*"
+      },
+      right: { kind: "NumericLiteral", value: 1 },
+      operator: "-"
+    }
+  ]
+}
+$>  42 * (3 - (2 - 1))
+{
+  kind: "Program",
+  body: [
+    {
+      kind: "BinaryExpr",
+      left: { kind: "NumericLiteral", value: 42 },
+      right: {
+        kind: "BinaryExpr",
+        left: { kind: "NumericLiteral", value: 3 },
+        right: {
+          kind: "BinaryExpr",
+          left: [Object],
+          right: [Object],
+          operator: "-"
+        },
+        operator: "-"
+      },
+      operator: "*"
+    }
+  ]
+}
+$>  1 + (2 + (3 + (4 + 5)))
 {
   kind: "Program",
   body: [
     {
       kind: "BinaryExpr",
       left: { kind: "NumericLiteral", value: 1 },
-      right: { kind: "NumericLiteral", value: 2 },
+      right: {
+        kind: "BinaryExpr",
+        left: { kind: "NumericLiteral", value: 2 },
+        right: {
+          kind: "BinaryExpr",
+          left: [Object],
+          right: [Object],
+          operator: "+"
+        },
+        operator: "+"
+      },
       operator: "+"
     }
   ]
 }
+$>  
 ```
 ```shell
 $>  10 x foo bar
@@ -39,25 +105,6 @@ $>  10 x foo bar
     { kind: "Identifier", symbol: "x" },
     { kind: "Identifier", symbol: "foo" },
     { kind: "Identifier", symbol: "bar" }
-  ]
-}
-```
-```shell
-$>  1 + 2 - 4
-{
-  kind: "Program",
-  body: [
-    {
-      kind: "BinaryExpr",
-      left: {
-        kind: "BinaryExpr",
-        left: { kind: "NumericLiteral", value: 1 },
-        right: { kind: "NumericLiteral", value: 2 },
-        operator: "+"
-      },
-      right: { kind: "NumericLiteral", value: 4 },
-      operator: "-"
-    }
   ]
 }
 ```
